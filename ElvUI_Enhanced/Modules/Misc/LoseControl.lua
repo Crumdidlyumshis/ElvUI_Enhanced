@@ -186,7 +186,7 @@ local function CheckPriority(priority, ccPriority, expirationTime, ccExpirationT
 	end
 end
 
-function LC:UNIT_AURA(event, unit)
+function LC:UNIT_AURA(_, unit)
 	if unit ~= "player" then return end
 
 	local ccExpirationTime = 0
@@ -211,7 +211,7 @@ function LC:UNIT_AURA(event, unit)
 			if self.wyvernSting == 2 then
 				name = nil
 			end
-		elseif name == self.psychicHorrorName and icon ~= "Interface\\Icons\\Ability_Warrior_Disarm" then
+		elseif name == self.psychicHorrorName and icon ~= [[Interface\Icons\Ability_Warrior_Disarm]] then
 			name = nil
 		end
 

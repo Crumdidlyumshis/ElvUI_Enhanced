@@ -14,8 +14,11 @@ local function SelectQuestReward(id)
 	if button.type == "choice" then
 		if E.private.skins.blizzard.enable and E.private.skins.blizzard.quest then
 			_G[button:GetName()]:SetBackdropBorderColor(1, 0.80, 0.10)
-			_G[button:GetName()].backdrop:SetBackdropBorderColor(1, 0.80, 0.10)
 			_G[button:GetName().."Name"]:SetTextColor(1, 0.80, 0.10)
+
+			if _G[button:GetName()].backdrop then
+				_G[button:GetName()].backdrop:SetBackdropBorderColor(1, 0.80, 0.10)
+			end
 		else
 			QuestInfoItemHighlight:ClearAllPoints()
 			QuestInfoItemHighlight:SetAllPoints(button)

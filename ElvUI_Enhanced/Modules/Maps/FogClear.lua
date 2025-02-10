@@ -1052,7 +1052,7 @@ local function UpdateOverlayTextures(frame, frameName, textureCache, scale, r, g
 		return
 	end
 
-	local pathPrefix = "Interface\\WorldMap\\"..mapFileName.."\\"
+	local pathPrefix = [[Interface\WorldMap\]]..mapFileName..[[\]]
 	local overlayMap = errata[mapFileName]
 	local numOverlays = GetNumMapOverlays()
 	local pathLen = len(pathPrefix) + 1

@@ -87,7 +87,7 @@ function mod:DressUpFrame()
 	local _, classFileName = UnitClass("player")
 	DressUpFrame.ModelBackground = DressUpFrame:CreateTexture()
 	DressUpFrame.ModelBackground:SetAllPoints(DressUpModel)
-	DressUpFrame.ModelBackground:SetTexture("Interface\\AddOns\\ElvUI_Enhanced\\Media\\Textures\\backgrounds\\DressingRoom"..classFileName)
+	DressUpFrame.ModelBackground:SetTexture([[Interface\AddOns\ElvUI_Enhanced\Media\Textures\backgrounds\DressingRoom]]..classFileName)
 	DressUpFrame.ModelBackground:SetTexCoord(0.00195312, 0.935547, 0.00195312, 0.978516)
 	DressUpFrame.ModelBackground:SetDesaturated(true)
 

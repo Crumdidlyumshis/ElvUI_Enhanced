@@ -37,7 +37,6 @@ local ignoreButtons = {
 
 local genericIgnores = {
 	"GuildInstance",
-
 	-- GatherMate
 	"GatherMatePin",
 	-- Gatherer
@@ -50,7 +49,7 @@ local genericIgnores = {
 	"LibRockConfig-1.0_MinimapButton",
 	-- Nauticus
 	"NauticusMiniIcon",
-	"WestPointer",
+	"QuestPointer",
 	-- QuestPointer
 	"poiMinimap",
 	-- Spy
@@ -190,17 +189,19 @@ function MBG:SkinMinimapButton(button)
 				region:SetTexture(nil)
 			else
 				if name == "BagSync_MinimapButton" then
-					region:SetTexture("Interface\\AddOns\\BagSync\\media\\icon")
+					region:SetTexture([[Interface\AddOns\BagSync\media\icon]])
 				elseif name == "DBMMinimapButton" then
-					region:SetTexture("Interface\\Icons\\INV_Helmet_87")
+					region:SetTexture([[Interface\Icons\INV_Helmet_87]])
 				elseif name == "OutfitterMinimapButton" then
-					if region:GetTexture() == "Interface\\Addons\\Outfitter\\Textures\\MinimapButton" then
+					if region:GetTexture() == [[Interface\Addons\Outfitter\Textures\MinimapButton]] then
 						region:SetTexture(nil)
 					end
 				elseif name == "SmartBuff_MiniMapButton" then
-					region:SetTexture("Interface\\Icons\\Spell_Nature_Purge")
+					region:SetTexture([[Interface\Icons\Spell_Nature_Purge]])
 				elseif name == "VendomaticButtonFrame" then
-					region:SetTexture("Interface\\Icons\\INV_Misc_Rabbit_2")
+					region:SetTexture([[Interface\Icons\INV_Misc_Rabbit_2]])
+				else
+					region:SetTexture(texture)
 				end
 
 				region:ClearAllPoints()
@@ -315,6 +316,7 @@ function MBG:UpdatePosition()
 	if db.enable then
 		self.frame:ClearAllPoints()
 		self.frame:Point(db.position, Minimap, db.position, db.xOffset, db.yOffset)
+		self.frame:SetFrameLevel(Minimap:GetFrameLevel() + 1)
 
 		E:DisableMover(self.frame.mover:GetName())
 	else
@@ -432,7 +434,7 @@ function MBG:Initialize()
 
 	self.frame = CreateFrame("Frame", "ElvUI_MinimapButtonGrabber", UIParent)
 	self.frame:Size(db.buttonSize + (spacing * 2))
-	self.frame:Point("TOPRIGHT", MMHolder, "BOTTOMRIGHT", 0, 1)
+	self.frame:Point("TOPRIGHT", ElvUI_MinimapHolder, "BOTTOMRIGHT", 0, 1)
 	self.frame:SetFrameStrata("LOW")
 	self.frame:SetClampedToScreen(true)
 	self.frame:CreateBackdrop()
@@ -454,7 +456,7 @@ function MBG:Initialize()
 	self:UpdatePosition()
 	self:GrabMinimapButtons()
 
-	self:ScheduleRepeatingTimer("GrabMinimapButtons", 5)
+	self:ScheduleRepeatingTimer("GrabMinimapButtons", 3)
 
 	local AddonsCompat = E:GetModule("Enhanced_AddonsCompat")
 	for addon, func in pairs(addonFixes) do

@@ -55,23 +55,9 @@ local function AddonList_IsDepsLoaded(...)
 end
 
 local function AddonList_SetStatus(entry, load, status, reload)
-	if load then
-		entry.LoadButton:Show()
-	else
-		entry.LoadButton:Hide()
-	end
-
-	if status then
-		entry.Status:Show()
-	else
-		entry.Status:Hide()
-	end
-
-	if reload then
-		entry.Reload:Show()
-	else
-		entry.Reload:Hide()
-	end
+	entry.LoadButton:SetShown(load)
+	entry.Status:SetShown(status)
+	entry.Reload:SetShown(reload)
 end
 
 local function AddonList_Update()
@@ -384,7 +370,12 @@ function mod:AddonList()
 	end
 
 	local buttonAddons = CreateFrame("Button", "ElvUI_AddonListButton", GameMenuFrame, "GameMenuButtonTemplate")
-	buttonAddons:Point("TOP", GameMenuButtonMacros, "BOTTOM", 0, -1)
+	local point, relativeTo, relativePoint, x, y= GameMenuButtonMacros:GetPoint(1)
+	if (relativeTo and relativeTo ~= buttonAddons) then
+		buttonAddons:SetPoint(point, relativeTo, relativePoint, x, y)
+	end
+	GameMenuButtonMacros:ClearAllPoints()
+	GameMenuButtonMacros:SetPoint("TOP", buttonAddons, "BOTTOM", 0, -1)
 	buttonAddons:SetText(ADDONS)
 	S:HandleButton(buttonAddons)
 	buttonAddons:SetScript("OnClick", function()

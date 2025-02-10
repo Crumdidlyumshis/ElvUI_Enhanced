@@ -131,7 +131,6 @@ P.enhanced = {
 		}
 	},
 	tooltip = {
-		itemQualityBorderColor = false,
 		tooltipIcon = {
 			enable = false,
 			tooltipIconSpells = true,

@@ -153,6 +153,8 @@ local STAT_RESILIENCE = STAT_RESILIENCE
 -- GLOBALS: PlayerTitlePickerFrame, SetButtonPulse, SetCVar, StaticPopup_Hide, UIFrameFadeIn, UIFrameFadeOut, hooksecurefunc, table
 -- GLOBALS: EQUIPSET_EQUIP, SAVE
 
+local backgrounds = [[Interface\AddOns\ElvUI_Enhanced\Media\Textures\backgrounds\]]
+
 local CHARACTERFRAME_EXPANDED_WIDTH = 197
 
 local STATCATEGORY_MOVING_INDENT = 4
@@ -168,13 +170,13 @@ local PAPERDOLL_SIDEBARS = {
 	{
 		name = L["Titles"],
 		frame = "PaperDollTitlesPane",
-		icon = "Interface\\AddOns\\ElvUI_Enhanced\\Media\\Textures\\PaperDollSidebarTabs",
+		icon = [[Interface\AddOns\ElvUI_Enhanced\Media\Textures\PaperDollSidebarTabs]],
 		texCoords = {0.01562500, 0.53125000, 0.32421875, 0.46093750}
 	},
 	{
 		name = L["Equipment Manager"],
 		frame = "PaperDollEquipmentManagerPane",
-		icon = "Interface\\AddOns\\ElvUI_Enhanced\\Media\\Textures\\PaperDollSidebarTabs",
+		icon = [[Interface\AddOns\ElvUI_Enhanced\Media\Textures\PaperDollSidebarTabs]],
 		texCoords = {0.01562500, 0.53125000, 0.46875000, 0.60546875}
 	}
 }
@@ -564,201 +566,6 @@ do
 	end
 end
 
---[[
-local function OnEvent(event, bagID, slotID)
-	if event == "ITEM_UNLOCKED" then
-		if not slotID then
-			-- equiped item removed
-		else
-			-- bag item removed
-		end
-	end
-end
-
-local slots = {
-	["HeadSlot"] = "INVTYPE_HEAD",
-	["NeckSlot"] = "INVTYPE_NECK",
-	["ShoulderSlot"] = "INVTYPE_SHOULDER",
-	["BackSlot"] = "INVTYPE_CLOAK",
-	["ChestSlot"] = "INVTYPE_ROBE",
-	["WristSlot"] = "INVTYPE_WRIST",
-	["HandsSlot"] = "INVTYPE_HAND",
-	["WaistSlot"] = "INVTYPE_WAIST",
-	["LegsSlot"] = "INVTYPE_LEGS",
-	["FeetSlot"] = "INVTYPE_FEET",
-	["Finger0Slot"] = "INVTYPE_FINGER",
-	["Finger1Slot"] = "INVTYPE_FINGER",
-	["Trinket0Slot"] = "INVTYPE_TRINKET",
-	["Trinket1Slot"] = "INVTYPE_TRINKET",
-	["MainHandSlot"] = {"INVTYPE_WEAPONMAINHAND", "INVTYPE_2HWEAPON", "INVTYPE_WEAPON"},
-	["SecondaryHandSlot"] = {"INVTYPE_WEAPONOFFHAND", "INVTYPE_SHIELD", "INVTYPE_HOLDABLE", "INVTYPE_WEAPON"},
-	["RangedSlot"] = {"INVTYPE_RANGED", "INVTYPE_RANGEDRIGHT", "INVTYPE_THROWN", "INVTYPE_RELIC"}
-}
-
-local bagsTable = {}
-
-local function sortItemLevel(a, b)
-	return a > b
-end
-
-local function GetAverageItemLevel()
-	local _, itemLink, itemLevel, itemEquipLoc, slotID
-	local totalItemLevel, totalEquippedItemLevel = 0, 0
-	local items = 16
-
-	for bag = 0, 4 do
-		for slot = 1, GetContainerNumSlots(bag) do
-			itemLink = GetContainerItemLink(bag, slot)
-			if itemLink then
-				_, _, _, itemLevel, _, _, _, _, itemEquipLoc = GetItemInfo(itemLink)
-				if itemEquipLoc and itemEquipLoc ~= "" then
-					if itemEquipLoc == "INVTYPE_WEAPON" or (titanGrip and itemEquipLoc == "INVTYPE_2HWEAPON") then
-						if not bagsTable[itemEquipLoc] then
-							bagsTable[itemEquipLoc] = {itemLevel}
-						elseif #bagsTable[itemEquipLoc] == 1 then
-							bagsTable[itemEquipLoc][2] = itemLevel
-							sort(bagsTable[itemEquipLoc], sortItemLevel)
-						elseif itemLevel > bagsTable[itemEquipLoc][1] then
-							bagsTable[itemEquipLoc][2] = bagsTable[itemEquipLoc][1]
-							bagsTable[itemEquipLoc][1] = itemLevel
-						elseif itemLevel > bagsTable[itemEquipLoc][2] then
-							bagsTable[itemEquipLoc][2] = itemLevel
-						end
-					else
-						if not bagsTable[itemEquipLoc] then
-							bagsTable[itemEquipLoc] = itemLevel
-						elseif itemLevel > bagsTable[itemEquipLoc] then
-							bagsTable[itemEquipLoc] = itemLevel
-						end
-					end
-				end
-			end
-		end
-	end
-
-	local hasMainHandBag, maxBagItemLevel, countBagOffhand
-	local hasTwoHandBag = bagsTable["INVTYPE_2HWEAPON"]
-
-	for slotName, itemLoc in pairs(slots) do
-		slotID = GetInventorySlotInfo(slotName)
-		itemLink = GetInventoryItemLink("player", slotID)
-
-		if itemLink then
-			_, _, _, itemLevel, _, _, _, _, itemEquipLoc = GetItemInfo(itemLink)
-
-			if itemLevel and itemLevel > 0 then
-				if type(itemLoc) == "table" then
-					local maxLocItemLevel = 0
-					for _, bagItemLoc in ipairs(itemLoc) do
-						maxBagItemLevel = bagsTable[bagItemLoc]
-
-						if maxBagItemLevel and maxBagItemLevel > maxLocItemLevel then
-							maxLocItemLevel = maxBagItemLevel
-						end
-					end
-
-					maxBagItemLevel = maxLocItemLevel ~= 0 and maxLocItemLevel
-				else
-					maxBagItemLevel = bagsTable[itemEquipLoc]
-				end
-
-				if maxBagItemLevel and maxBagItemLevel > itemLevel then
-					totalItemLevel = totalItemLevel + maxBagItemLevel
-				else
-					totalItemLevel = totalItemLevel + itemLevel
-				end
-
-				totalEquippedItemLevel = totalEquippedItemLevel + itemLevel
-
-				if slotName == "MainHandSlot" and (itemEquipLoc ~= "INVTYPE_2HWEAPON" or titanGrip) then
-					items = 17
-					countBagOffhand = true
-				end
-			end
-		else
-			if type(itemLoc) == "table" then
-				local maxLocItemLevel = 0
-
-				if slotName == "SecondaryHandSlot" then
-					if titanGrip then
-						maxLocItemLevel = bagsTable["INVTYPE_2HWEAPON"]
-					end
-
-					if not titanGrip or maxLocItemLevel < bagsTable["INVTYPE_WEAPON"] then
-						maxLocItemLevel = bagsTable["INVTYPE_WEAPON"]
-					end
-				end
-
-				for _, bagItemLoc in ipairs(itemLoc) do
-					maxBagItemLevel = bagsTable[bagItemLoc]
-
-					if maxBagItemLevel and maxBagItemLevel > maxLocItemLevel then
-						maxLocItemLevel = maxBagItemLevel
-					end
-				end
-
-				maxBagItemLevel = maxLocItemLevel ~= 0 and maxLocItemLevel
-			else
-				maxBagItemLevel = bagsTable[itemLoc]
-			end
-
-			if maxBagItemLevel and (slotName ~= "SecondaryHandSlot" or countBagOffhand) then
-				totalItemLevel = totalItemLevel + maxBagItemLevel
-			end
-
-			if slotName == "MainHandSlot" then
-				if hasTwoHandBag then
-					if maxBagItemLevel then
-						if hasTwoHandBag > maxBagItemLevel then
-							hasMainHandBag = hasTwoHandBag
-						end
-					else
-						hasMainHandBag = hasTwoHandBag
-					end
-				end
-			end
-		end
-	end
-
-	wipe(bagsTable)
-
-	if hasMainHandBag then
-		totalItemLevel = totalItemLevel + hasMainHandBag
-	end
-
-	return (totalItemLevel / 17), (totalEquippedItemLevel / items)
-end
-
-local function GetItemLevelColor(unit)
-	if not unit then unit = "player" end
-
-	local i = 0
-	local sumR, sumG, sumB = 0, 0, 0
-	for slotName in pairs(slots) do
-		local slotID = GetInventorySlotInfo(slotName)
-		if GetInventoryItemTexture(unit, slotID) then
-			local itemLink = GetInventoryItemLink(unit, slotID)
-			if itemLink then
-				local quality = select(3, GetItemInfo(itemLink))
-				if quality then
-					i = i + 1
-					local r, g, b = GetItemQualityColor(quality)
-					sumR = sumR + r
-					sumG = sumG + g
-					sumB = sumB + b
-				end
-			end
-		end
-	end
-
-	if i > 0 then
-		return (sumR / i), (sumG / i), (sumB / i)
-	else
-		return 1, 1, 1
-	end
-end
-]]
-
 local function GetAverageItemLevel()
 	local items = 16
 	local ilvl = 0
@@ -835,14 +642,6 @@ function module:ItemLevel(statFrame, unit)
 			return
 		end
 	end
-
---	local avgItemLevel, avgItemLevelEquipped = GetAverageItemLevel()
---	if avgItemLevelEquipped == avgItemLevel then
---		statFrame.Label:SetFormattedText("%.2f", avgItemLevelEquipped)
---	else
---		statFrame.Label:SetFormattedText("%.2f / %.2f", avgItemLevelEquipped, avgItemLevel)
---	end
---	statFrame.Label:SetTextColor(GetItemLevelColor())
 
 	local avgItemLevel, r, g, b = GetAverageItemLevel()
 	statFrame.Label:SetFormattedText("%.1f", avgItemLevel)
@@ -972,7 +771,7 @@ function module:SetResistance(statFrame, unit, resistanceIndex)
 	local petBonus = ComputePetBonus("PET_BONUS_RES", resistance)
 	local resistanceNameShort = _G["SPELL_SCHOOL"..resistanceIndex.."_CAP"]
 	local resistanceName = _G["RESISTANCE"..resistanceIndex.."_NAME"]
-	local resistanceIconCode = "|TInterface\\PaperDollInfoFrame\\SpellSchoolIcon"..(resistanceIndex + 1)..":14:14:2:2:16:16:2:14:2:14|t"
+	local resistanceIconCode = [[|TInterface\PaperDollInfoFrame\SpellSchoolIcon]]..(resistanceIndex + 1)..":14:14:2:2:16:16:2:14:2:14|t"
 	statFrame.Label:SetText(resistanceIconCode.." "..format(STAT_FORMAT, resistanceNameShort))
 	local text = _G[statFrame:GetName().."StatText"]
 	PaperDollFormatStat(resistanceName, base, positive, negative, statFrame, text)
@@ -1167,7 +966,6 @@ end
 local function PaperDollFrame_CollapseStatCategory(categoryFrame)
 	if not categoryFrame.collapsed then
 		categoryFrame.collapsed = true
-		--categoryFrame.Toolbar:SetTemplate("NoBackdrop")
 		categoryFrame.Toolbar:SetAlpha(0.4)
 		local index = 1
 		while categoryFrame.Stats[index] do
@@ -1182,7 +980,6 @@ end
 local function PaperDollFrame_ExpandStatCategory(categoryFrame)
 	if categoryFrame.collapsed then
 		categoryFrame.collapsed = false
-		--categoryFrame.Toolbar:SetTemplate("Default", true)
 		categoryFrame.Toolbar:SetAlpha(1)
 		module:PaperDollFrame_UpdateStatCategory(categoryFrame)
 		module:PaperDollFrame_UpdateStatScrollChildHeight()
@@ -1456,7 +1253,7 @@ local function PaperDoll_SaveStatCategoryOrder()
 		E.private.enhanced.character[CharacterStatsPane.unit].orderName = tconcat(order, ",")
 	else
 		E.private.enhanced.character[CharacterStatsPane.unit].orderName2 = tconcat(order, ",")
-	end    
+	end
 end
 
 function module:PaperDoll_UpdateCategoryPositions()
@@ -1729,7 +1526,7 @@ function module:PaperDollEquipmentManagerPane_Update()
 				if texture then
 					button.icon:SetTexture(texture)
 				else
-					button.icon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
+					button.icon:SetTexture([[Interface\Icons\INV_Misc_QuestionMark]])
 				end
 
 				if selectedName and button.name == selectedName then
@@ -1742,7 +1539,7 @@ function module:PaperDollEquipmentManagerPane_Update()
 				button.name = nil
 				button.text:SetText(L["New Set"])
 				button.text:SetTextColor(GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b)
-				button.icon:SetTexture("Interface\\Icons\\Spell_ChargePositive")
+				button.icon:SetTexture([[Interface\Icons\Spell_ChargePositive]])
 				button.SelectedBar:Hide()
 			end
 
@@ -1880,19 +1677,19 @@ function module:UpdateCharacterModelFrame()
 		local desaturate = E.db.enhanced.character.desaturateCharacter and true or false
 		local raceEng = lower(E.myrace)
 
-		CharacterModelFrame.textureTopLeft:SetTexture("Interface\\AddOns\\ElvUI_Enhanced\\Media\\Textures\\backgrounds\\"..raceEng.."_1.blp")
+		CharacterModelFrame.textureTopLeft:SetTexture(backgrounds..raceEng.."_1.blp")
 		CharacterModelFrame.textureTopLeft:SetDesaturated(desaturate)
 		CharacterModelFrame.textureTopLeft:Show()
 
-		CharacterModelFrame.textureTopRight:SetTexture("Interface\\AddOns\\ElvUI_Enhanced\\Media\\Textures\\backgrounds\\"..raceEng.."_2.blp")
+		CharacterModelFrame.textureTopRight:SetTexture(backgrounds..raceEng.."_2.blp")
 		CharacterModelFrame.textureTopRight:SetDesaturated(desaturate)
 		CharacterModelFrame.textureTopRight:Show()
 
-		CharacterModelFrame.textureBotLeft:SetTexture("Interface\\AddOns\\ElvUI_Enhanced\\Media\\Textures\\backgrounds\\"..raceEng.."_3.blp")
+		CharacterModelFrame.textureBotLeft:SetTexture(backgrounds..raceEng.."_3.blp")
 		CharacterModelFrame.textureBotLeft:SetDesaturated(desaturate)
 		CharacterModelFrame.textureBotLeft:Show()
 
-		CharacterModelFrame.textureBotRight:SetTexture("Interface\\AddOns\\ElvUI_Enhanced\\Media\\Textures\\backgrounds\\"..raceEng.."_4.blp")
+		CharacterModelFrame.textureBotRight:SetTexture(backgrounds..raceEng.."_4.blp")
 		CharacterModelFrame.textureBotRight:SetDesaturated(desaturate)
 		CharacterModelFrame.textureBotRight:Show()
 
@@ -1960,19 +1757,19 @@ function module:UpdateInspectModelFrame()
 		raceEng = lower(raceEng)
 		local desaturate = E.db.enhanced.character.desaturateInspect and true or false
 
-		InspectModelFrame.textureTopLeft:SetTexture("Interface\\AddOns\\ElvUI_Enhanced\\Media\\Textures\\backgrounds\\"..raceEng.."_1.blp")
+		InspectModelFrame.textureTopLeft:SetTexture(backgrounds..raceEng.."_1.blp")
 		InspectModelFrame.textureTopLeft:SetDesaturated(desaturate)
 		InspectModelFrame.textureTopLeft:Show()
 
-		InspectModelFrame.textureTopRight:SetTexture("Interface\\AddOns\\ElvUI_Enhanced\\Media\\Textures\\backgrounds\\"..raceEng.."_2.blp")
+		InspectModelFrame.textureTopRight:SetTexture(backgrounds..raceEng.."_2.blp")
 		InspectModelFrame.textureTopRight:SetDesaturated(desaturate)
 		InspectModelFrame.textureTopRight:Show()
 
-		InspectModelFrame.textureBotLeft:SetTexture("Interface\\AddOns\\ElvUI_Enhanced\\Media\\Textures\\backgrounds\\"..raceEng.."_3.blp")
+		InspectModelFrame.textureBotLeft:SetTexture(backgrounds..raceEng.."_3.blp")
 		InspectModelFrame.textureBotLeft:SetDesaturated(desaturate)
 		InspectModelFrame.textureBotLeft:Show()
 
-		InspectModelFrame.textureBotRight:SetTexture("Interface\\AddOns\\ElvUI_Enhanced\\Media\\Textures\\backgrounds\\"..raceEng.."_4.blp")
+		InspectModelFrame.textureBotRight:SetTexture(backgrounds..raceEng.."_4.blp")
 		InspectModelFrame.textureBotRight:SetDesaturated(desaturate)
 		InspectModelFrame.textureBotRight:Show()
 
@@ -2017,13 +1814,13 @@ function module:UpdatePetModelFrame()
 		end
 
 		if E.myclass == "HUNTER" then
-			PetModelFrame.petPaperDollPetModelBg:SetTexture("Interface\\AddOns\\ElvUI_Enhanced\\Media\\Textures\\backgrounds\\petHunter.blp")
+			PetModelFrame.petPaperDollPetModelBg:SetTexture(backgrounds.."petHunter.blp")
 			PetModelFrame.backgroundOverlay:SetAlpha(0.4)
 		elseif E.myclass == "WARLOCK" then
-			PetModelFrame.petPaperDollPetModelBg:SetTexture("Interface\\AddOns\\ElvUI_Enhanced\\Media\\Textures\\backgrounds\\petWarlock.blp")
+			PetModelFrame.petPaperDollPetModelBg:SetTexture(backgrounds.."petWarlock.blp")
 			PetModelFrame.backgroundOverlay:SetAlpha(0.2)
 		elseif E.myclass == "DEATHKNIGHT" then
-			PetModelFrame.petPaperDollPetModelBg:SetTexture("Interface\\AddOns\\ElvUI_Enhanced\\Media\\Textures\\backgrounds\\petDeathKnight.blp")
+			PetModelFrame.petPaperDollPetModelBg:SetTexture(backgrounds.."petDeathKnight.blp")
 			PetModelFrame.backgroundOverlay:SetAlpha(0.1)
 		else
 			PetModelFrame.petPaperDollPetModelBg:Hide()
@@ -2049,7 +1846,7 @@ function module:UpdateCompanionModelFrame()
 			CompanionModelFrame.backdrop:SetAllPoints(CompanionModelFrame)
 
 			CompanionModelFrame.backgroundTex = CompanionModelFrame:CreateTexture("$parentBackgroundTex", "BACKGROUND")
-			CompanionModelFrame.backgroundTex:SetTexture("Interface\\AddOns\\ElvUI_Enhanced\\Media\\Textures\\backgrounds\\MountJournal-BG")
+			CompanionModelFrame.backgroundTex:SetTexture(backgrounds.."MountJournal-BG")
 			CompanionModelFrame.backgroundTex:SetInside(CompanionModelFrame.backdrop)
 			CompanionModelFrame.backgroundTex:SetTexCoord(0.00390625, 0.783203125, 0.0078125, 0.984375)
 
@@ -2132,7 +1929,7 @@ local function CreateSmoothScrollAnimation(scrollBar, hybridScroll)
 end
 
 function module:Initialize()
-	if not E.private.enhanced.character.enable then return end
+	if not E.private.enhanced.character.enable or not E.private.skins.blizzard.enable or not E.private.skins.blizzard.character or E:IsHDPatch() then return end
 
 	self.skinEnabled = (E.private.skins.blizzard.enable and E.private.skins.blizzard.character) and true or false
 

@@ -59,19 +59,19 @@ function WMB:Initialize()
 
 	for i = 1, MAX_PARTY_MEMBERS do
 		frame = _G["WorldMapParty"..i]
-		frame.icon:SetTexture("Interface\\Addons\\ElvUI_Enhanced\\Media\\Textures\\PartyRaidBlips")
+		frame.icon:SetTexture([[Interface\Addons\ElvUI_Enhanced\Media\Textures\PartyRaidBlips]])
 		frame:Size(24)
 		frame:HookScript("OnShow", OnShowParty)
 	end
 
 	for i = 1, MAX_RAID_MEMBERS do
 		frame = _G["WorldMapRaid"..i]
-		frame.icon:SetTexture("Interface\\Addons\\ElvUI_Enhanced\\Media\\Textures\\PartyRaidBlips")
+		frame.icon:SetTexture([[Interface\Addons\ElvUI_Enhanced\Media\Textures\PartyRaidBlips]])
 		frame:Size(24)
 		frame:HookScript("OnShow", OnShowRaid)
 	end
 
-	Minimap:SetClassBlipTexture("Interface\\Addons\\ElvUI_Enhanced\\Media\\Textures\\PartyRaidBlips")
+	Minimap:SetClassBlipTexture([[Interface\Addons\ElvUI_Enhanced\Media\Textures\PartyRaidBlips]])
 end
 
 local function InitializeCallback()

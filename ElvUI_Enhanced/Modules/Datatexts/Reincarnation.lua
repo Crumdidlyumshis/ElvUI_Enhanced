@@ -19,7 +19,7 @@ local SPELL_FAILED_NOT_KNOWN = SPELL_FAILED_NOT_KNOWN
 local TIME_REMAINING = TIME_REMAINING
 
 local iconString = "|T%s:20:20:0:0:64:64:4:55:4:55|t"
-local tex = "Interface\\Icons\\Spell_Nature_Reincarnation"
+local tex = [[Interface\Icons\Spell_Nature_Reincarnation]]
 local displayString = ""
 
 local lastPanel

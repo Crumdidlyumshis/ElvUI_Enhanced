@@ -85,7 +85,7 @@ function TAM:StartOpening(mode)
 		self:AdvanceAndProcessNextMail()
 	end
 
-	E:StartSpinnerFrame(InboxFrame, 11, 12, 32, 76)
+	E:StartSpinner(InboxFrame, 11, 12, 32, 76)
 end
 
 function TAM:StopOpening(err)
@@ -108,7 +108,7 @@ function TAM:StopOpening(err)
 	self.takeAll:SetScript("OnUpdate", nil)
 	self:UpdateButtons()
 
-	E:StopSpinnerFrame(InboxFrame)
+	E:StopSpinner(InboxFrame)
 end
 
 function TAM:AdvanceToNextMail()

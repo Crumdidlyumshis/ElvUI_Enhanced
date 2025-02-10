@@ -10,7 +10,7 @@ local HasNewMail = HasNewMail
 local MAIL_LABEL = MAIL_LABEL
 local HAVE_MAIL_FROM = HAVE_MAIL_FROM
 
-local Mail_Icon = "|TInterface\\MINIMAP\\TRACKING\\Mailbox.blp:14:14|t"
+local Mail_Icon = [[|TInterface\MINIMAP\TRACKING\Mailbox.blp:14:14|t]]
 local Read
 
 local function MakeIconString()

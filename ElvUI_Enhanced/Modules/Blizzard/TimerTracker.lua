@@ -102,7 +102,7 @@ local TIMER_DATA = {
 
 local TIMER_NUMBERS_SETS = {}
 TIMER_NUMBERS_SETS["BigGold"] = {
-	texture = "Interface\\AddOns\\ElvUI_Enhanced\\media\\textures\\BigTimerNumbers",
+	texture = [[Interface\AddOns\ElvUI_Enhanced\media\textures\BigTimerNumbers]],
 	w = 256, h = 170, texW = 1024, texH = 512,
 	numberHalfWidths = {
 		35/128, -- 0
@@ -443,13 +443,13 @@ function TT:SetGoTexture(timer)
 		local factionGroup = UnitFactionGroup("player")
 
 		if factionGroup and factionGroup ~= "Neutral" then
-			timer.GoTexture:SetTexture("Interface\\AddOns\\ElvUI\\media\\textures\\"..factionGroup.."-Logo")
-			timer.GoTextureGlow:SetTexture("Interface\\AddOns\\ElvUI_Enhanced\\media\\textures\\"..factionGroup.."Glow-Logo")
+			timer.GoTexture:SetTexture([[Interface\AddOns\ElvUI\media\textures\]]..factionGroup.."-Logo")
+			timer.GoTextureGlow:SetTexture([[Interface\AddOns\ElvUI_Enhanced\media\textures\]]..factionGroup.."Glow-Logo")
 		end
 	elseif timer.type == TIMER_TYPE_CHALLENGE_MODE then
-		timer.GoTexture:SetTexture("Interface\\AddOns\\ElvUI_Enhanced\\media\\textures\\Challenges-Logo")
-		timer.GoTextureGlow:SetTexture("Interface\\AddOns\\ElvUI_Enhanced\\media\\textures\\ChallengesGlow-Logo")
-	elseif timer.type == TIMER_TYPE_PLAYER_COUNTDOWN then 
+		timer.GoTexture:SetTexture([[Interface\AddOns\ElvUI_Enhanced\media\textures\Challenges-Logo]])
+		timer.GoTextureGlow:SetTexture([[Interface\AddOns\ElvUI_Enhanced\media\textures\ChallengesGlow-Logo]])
+	elseif timer.type == TIMER_TYPE_PLAYER_COUNTDOWN then
 		timer.GoTexture:SetTexture("")
 		timer.GoTextureGlow:SetTexture("")
 	end

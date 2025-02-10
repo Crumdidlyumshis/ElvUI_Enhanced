@@ -506,9 +506,14 @@ function mod:DeathRecap()
 				self.text:SetText(DEATH_RELEASE_NOTIMER)
 			end
 			if HasEvents() then
+				local _, recapID = HasEvents()
+
 				self.button3:Enable()
 				self.button3:SetScript("OnEnter", S.SetModifiedBackdrop)
 				self.button3:SetScript("OnLeave", S.SetOriginalBackdrop)
+				self.button3:SetScript("OnClick", function()
+					OpenRecap(recapID)
+				end)
 			else
 				self.button3:Disable()
 				self.button3:SetScript("OnEnter", function(self)

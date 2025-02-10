@@ -61,7 +61,7 @@ function MF:ModelControlButton(model)
 
 	model.icon = model:CreateTexture("$parentIcon", "ARTWORK")
 	model.icon:SetInside()
-	model.icon:SetTexture("Interface\\AddOns\\ElvUI_Enhanced\\Media\\Textures\\UI-ModelControlPanel")
+	model.icon:SetTexture([[Interface\AddOns\ElvUI_Enhanced\Media\Textures\UI-ModelControlPanel]])
 	model.icon:SetTexCoord(0.01562500, 0.26562500, 0.00781250, 0.13281250)
 
 	model:SetScript("OnMouseDown", function(self) MF:ModelControlButton_OnMouseDown(self) end)
@@ -432,7 +432,7 @@ function MF:Initialize()
 	modelPanning:Size(32, 32)
 
 	modelPanning.texture = modelPanning:CreateTexture(nil, "ARTWORK")
-	modelPanning.texture:SetTexture("Interface\\AddOns\\ElvUI_Enhanced\\Media\\Textures\\UI-Cursor-Move")
+	modelPanning.texture:SetTexture([[Interface\AddOns\ElvUI_Enhanced\Media\Textures\UI-Cursor-Move]])
 	modelPanning.texture:SetAllPoints()
 
 	self:RegisterEvent("ADDON_LOADED")
