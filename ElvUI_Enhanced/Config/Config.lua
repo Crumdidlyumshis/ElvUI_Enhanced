@@ -926,7 +926,7 @@ local function MapOptions()
 end
 
 local function MinimapOptions()
-	E.Options.args.maps.args.minimap.args.locationTextGroup.args.locationText.values = {
+	E.Options.args.maps.args.minimap.args.cluster.args.locationTextGroup.args.locationText.values = {
 		["MOUSEOVER"] = L["Minimap Mouseover"],
 		["SHOW"] = L["Always Display"],
 		["ABOVE"] = EE:ColorizeSettingName(L["Above Minimap"]),
@@ -956,7 +956,7 @@ local function MinimapOptions()
 				name = L["Location Panel"],
 				desc = L["Toggle Location Panel."]
 			},
-			locationText = E.Options.args.maps.args.minimap.args.locationTextGroup.args.locationText,
+			locationText = E.Options.args.maps.args.minimap.args.cluster.args.locationTextGroup.args.locationText,
 			showlocationdigits = {
 				order = 2,
 				type = "toggle",
