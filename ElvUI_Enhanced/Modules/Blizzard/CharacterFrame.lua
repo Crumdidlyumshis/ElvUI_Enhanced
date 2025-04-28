@@ -1,6 +1,8 @@
 local E, L, V, P, G = unpack(ElvUI)
 local module = E:NewModule("Enhanced_CharacterFrame", "AceHook-3.0", "AceEvent-3.0")
 local S = E:GetModule("Skins")
+local LSM = E.Libs.LSM
+local LC = E.Libs.Compat
 
 local _G = _G
 local select, next, ipairs, pairs, tonumber, getmetatable = select, next, ipairs, pairs, tonumber, getmetatable
@@ -52,6 +54,8 @@ local UnitLevel = UnitLevel
 local UnitRace = UnitRace
 local UnitResistance = UnitResistance
 local UnitStat = UnitStat
+
+local GetAverageItemLevel = LC.GetAverageItemLevel
 
 local CharacterRangedDamageFrame_OnEnter = CharacterRangedDamageFrame_OnEnter
 local CharacterSpellCritChance_OnEnter = CharacterSpellCritChance_OnEnter
@@ -566,41 +570,6 @@ do
 	end
 end
 
-local function GetAverageItemLevel()
-	local items = 16
-	local ilvl = 0
-	local colorCount, sumR, sumG, sumB = 0, 0, 0, 0
-
-	for slotID = 1, 18 do
-		if slotID ~= INVSLOT_BODY then
-			local itemLink = GetInventoryItemLink("player", slotID)
-
-			if itemLink then
-				local _, _, quality, itemLevel, _, _, _, _, itemEquipLoc = GetItemInfo(itemLink)
-
-				if itemLevel then
-					ilvl = ilvl + itemLevel
-
-					colorCount = colorCount + 1
-					sumR = sumR + qualityColors[quality][1]
-					sumG = sumG + qualityColors[quality][2]
-					sumB = sumB + qualityColors[quality][3]
-
-					if slotID == INVSLOT_MAINHAND and (itemEquipLoc ~= "INVTYPE_2HWEAPON" or titanGrip) then
-						items = 17
-					end
-				end
-			end
-		end
-	end
-
-	if colorCount == 0 then
-		return ilvl / items, 1, 1, 1
-	else
-		return ilvl / items, (sumR / colorCount), (sumG / colorCount), (sumB / colorCount)
-	end
-end
-
 function module:SetLabelAndText(statFrame, label, text, isPercentage)
 	statFrame.Label:SetFormattedText(STAT_FORMAT, label)
 	if isPercentage then
@@ -612,6 +581,10 @@ end
 
 function module:ItemLevel(statFrame, unit)
 	if not self.Initialized then return end
+
+	local totalLevelFont = LSM:Fetch('font', E.db.general.itemLevel.totalLevelFont)
+	local totalLevelFontSize = E.db.general.itemLevel.totalLevelFontSize or 12
+	local totalLevelFontOutline = E.db.general.itemLevel.totalLevelFontOutline or 'OUTLINE'
 
 	if GearScore_GetScore then
 		if not self.gearScore or not GS_PlayerIsInCombat then
@@ -633,19 +606,22 @@ function module:ItemLevel(statFrame, unit)
 
 				statFrame.Label:SetText(gearScore)
 				statFrame.Label:SetTextColor(r, g, b)
+				statFrame.Label:FontTemplate(totalLevelFont, totalLevelFontSize, totalLevelFontOutline)
 
 				return
 			end
 		else
 			statFrame.Label:SetText(self.gearScore)
 			statFrame.Label:SetTextColor(self.gearScoreR, self.gearScoreG, self.gearScoreB)
+			statFrame.Label:FontTemplate(totalLevelFont, totalLevelFontSize, totalLevelFontOutline)
 			return
 		end
 	end
 
 	local avgItemLevel, r, g, b = GetAverageItemLevel()
-	statFrame.Label:SetFormattedText("%.1f", avgItemLevel)
+	statFrame.Label:SetText(E:Round(avgItemLevel, 2))
 	statFrame.Label:SetTextColor(r, g, b)
+	statFrame.Label:FontTemplate(totalLevelFont, totalLevelFontSize, totalLevelFontOutline)
 end
 
 function module:SetStat(statFrame, unit, statIndex)
