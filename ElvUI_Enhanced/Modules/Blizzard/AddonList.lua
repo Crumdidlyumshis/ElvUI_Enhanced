@@ -370,48 +370,86 @@ function mod:AddonList()
 	end
 
 	local buttonAddons = CreateFrame("Button", "ElvUI_AddonListButton", GameMenuFrame, "GameMenuButtonTemplate")
-	local point, relativeTo, relativePoint, x, y= GameMenuButtonMacros:GetPoint(1)
-	if (relativeTo and relativeTo ~= buttonAddons) then
-		buttonAddons:SetPoint(point, relativeTo, relativePoint, x, y)
-	end
-	GameMenuButtonMacros:ClearAllPoints()
-	GameMenuButtonMacros:SetPoint("TOP", buttonAddons, "BOTTOM", 0, -1)
-	buttonAddons:SetText(ADDONS)
+	buttonAddons:SetText(_G.ADDONS)
+
 	S:HandleButton(buttonAddons)
+
 	buttonAddons:SetScript("OnClick", function()
 		HideUIPanel(GameMenuFrame)
 		ElvUI_AddonList:Show()
 	end)
 
-	self:HookScript(GameMenuButtonRatings, "OnShow", function(self)
-		buttonAddons:Point("TOP", self, "BOTTOM", 0, -1)
-	end)
-
-	self:HookScript(GameMenuButtonRatings, "OnHide", function(self)
-		buttonAddons:Point("TOP", GameMenuButtonMacros, "BOTTOM", 0, -1)
-	end)
-
-	GameMenuButtonLogout:SetScript("OnShow", function(self)
-		self:Point("TOP", buttonAddons, "BOTTOM", 0, -16)
-
-		if not StaticPopup_Visible("CAMP") and not StaticPopup_Visible("QUIT") then
-			self:Enable()
-		else
-			self:Disable()
-		end
-	end)
-
-	if GetLocale() == "koKR" then
-		if IsMacClient() then
-			GameMenuFrame:Height(308)
-		else
-			GameMenuFrame:Height(282)
-		end
-	else
-		if IsMacClient() then
-			GameMenuFrame:Height(292)
-		else
-			GameMenuFrame:Height(266)
-		end
+	local point, relativeTo, relativePoint, x, y = _G.GameMenuButtonMacros:GetPoint(1)
+	if (relativeTo and relativeTo ~= buttonAddons) then
+		buttonAddons:SetPoint(point, relativeTo, relativePoint, x, y)
 	end
+
+	local btnFilter = {
+		["GameMenuButtonLogout"] = true,
+		["GameMenuButtonContinue"] = true
+	}
+
+	-- Cache frequently used values
+	local SPACING = -1
+	local TOP_PADDING = -25
+	local HEIGHT_PADDING = 45
+	local DEFAULT_BTN_HEIGHT = 22
+
+	-- Pre-allocate table to avoid repeated allocations
+	local buttons = {}
+
+	hooksecurefunc(GameMenuFrame, "Show", function(self)
+		-- Clear previous buttons (reuse table)
+		for i = #buttons, 1, -1 do
+			buttons[i] = nil
+		end
+
+		local buttonCount = 0
+		for _, button in ipairs({self:GetChildren()}) do
+			if button:IsShown() and button:GetObjectType() == "Button" then
+				buttonCount = buttonCount + 1
+				buttons[buttonCount] = button
+			end
+		end
+
+		-- Exit early if no buttons
+		if buttonCount == 0 then return end
+
+		-- Sort by Y position (top to bottom) - cache GetCenter calls
+		table.sort(buttons, function(a, b)
+			local _, ay = a:GetCenter()
+			local _, by = b:GetCenter()
+			return (ay or 0) > (by or 0)
+		end)
+
+		-- Get button height once from first button
+		local btnHeight = buttons[1]:GetHeight() or DEFAULT_BTN_HEIGHT
+		local firstTop, lastBottom
+
+		-- Re-anchor buttons and track positions in single loop
+		for i, btn in ipairs(buttons) do
+			if i > buttonCount then break end
+
+			local btnName = btn:GetName()
+			btn:ClearAllPoints()
+
+			if i == 1 then
+				btn:SetPoint("TOP", self, "TOP", 0, TOP_PADDING)
+				firstTop = btn:GetTop()
+			else
+				local spacing = btnFilter[btnName] and -btnHeight or SPACING
+				btn:SetPoint("TOP", buttons[i-1], "BOTTOM", 0, spacing)
+			end
+
+			-- Update lastBottom for final button
+			if i == buttonCount then
+				lastBottom = btn:GetBottom()
+			end
+		end
+
+		-- Adjust frame height if we have valid positions
+		if firstTop and lastBottom then
+			self:SetHeight((firstTop - lastBottom) + HEIGHT_PADDING)
+		end
+	end)
 end
