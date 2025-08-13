@@ -5,7 +5,7 @@ local pairs, ipairs = pairs, ipairs
 local select = select
 local unpack = unpack
 local ceil = math.ceil
-local find, len, sub = string.find, string.len, string.sub
+local find, len, strmatch, sub = string.find, string.len, string.match, string.sub
 local tinsert = table.insert
 
 local UIFrameFadeIn = UIFrameFadeIn
@@ -49,8 +49,11 @@ local genericIgnores = {
 	"LibRockConfig-1.0_MinimapButton",
 	-- Nauticus
 	"NauticusMiniIcon",
-	"QuestPointer",
 	-- QuestPointer
+	"QuestPointer",
+	-- Questie
+	"QuestieFrame",
+	-- POI Minimap
 	"poiMinimap",
 	-- Spy
 	"Spy_MapNoteList_mini",
