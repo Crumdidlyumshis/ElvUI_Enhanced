@@ -13,8 +13,8 @@ local MAX_ARENA_ENEMIES = 5
 
 local function checkHDModels()
 	local hdTexturePathList = {
-		"Character\\Tauren\\Male\\TaurenMaleFaceLower00_00_HD",
-		"Character\\Draenei\\Male\\DraeneiMalefaceUpper00_00_hd",
+		[[Character\Tauren\Male\TaurenMaleFaceLower00_00_HD]],
+		[[Character\Draenei\Male\DraeneiMalefaceUpper00_00_hd]],
 	}
 
 	local f = CreateFrame("Frame")
