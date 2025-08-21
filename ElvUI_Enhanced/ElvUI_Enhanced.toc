@@ -1,7 +1,7 @@
 ## Interface: 30300
 ## Author: Bunny, Apollyon, Loaal, Crum
 ## Version: 1.05
-## Title: |cff1784d1E|r|cffe5e3e3lvUI|r |cff1784d1E|r|cffe5e3e3nhanced|r
+## Title: |cff1784d1E|cff3399d1l|cff4daed1v|cff66c3d1U|cff80d8d1I|r |cffffffffEnhanced|r
 ## Notes: Plugin-Enhancements for |cff1784d1E|r|cffe5e3e3lvUI|r.
 ## SavedVariables: EnhancedDB
 ## RequiredDeps: ElvUI
