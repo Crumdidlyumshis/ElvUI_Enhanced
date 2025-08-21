@@ -99,8 +99,9 @@ local function HideMinimap()
 end
 
 local function Update_ZoneText()
-	-- wait for xMap and yMap to be populated
-	if E.db.enhanced.minimap.showlocationdigits and xMap and yMap then
+	if not xMap or not yMap or not location then return end
+
+	if E.db.enhanced.minimap.showlocationdigits then
 		xMap.text:FontTemplate(E.LSM:Fetch('font', E.db.general.minimap.locationFont), E.db.general.minimap.locationFontSize, E.db.general.minimap.locationFontOutline)
 		yMap.text:FontTemplate(E.LSM:Fetch('font', E.db.general.minimap.locationFont), E.db.general.minimap.locationFontSize, E.db.general.minimap.locationFontOutline)
 	end
